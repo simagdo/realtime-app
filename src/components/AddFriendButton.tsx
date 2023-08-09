@@ -1,6 +1,6 @@
 'use client'
 
-import React, {FunctionComponent, useState} from 'react';
+import React, {useState} from 'react';
 import Button from "@/components/ui/Button";
 import {addFriendValidator} from "@/lib/validations/add-friend";
 import axios, {AxiosError} from "axios";
@@ -10,7 +10,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 
 type FormData = z.infer<typeof addFriendValidator>;
 
-const AddFriendButton: FunctionComponent<AddFriendButtonProps> = () => {
+const AddFriendButton = () => {
     const [showSuccessState, setShowSuccessState] = useState(false);
     const {
         register,
