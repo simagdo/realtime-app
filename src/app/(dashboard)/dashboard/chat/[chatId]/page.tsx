@@ -82,7 +82,9 @@ const Chat: FC<ChatProps> = async ({params: {chatId}}) => {
 
             <Messages
                 initialMessages={initialMessages}
-                sessionId={session.user.id}/>
+                sessionId={session.user.id}
+                sessionImage={session.user.image}
+                chatPartner={chatPartner}/>
             <ChatInput
                 chatPartner={chatPartner}
                 chatId={chatId}/>
