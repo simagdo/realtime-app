@@ -1,9 +1,11 @@
 'use client'
 
-import React, {FunctionComponent, useState} from 'react';
+import React, {FunctionComponent, useEffect, useState} from 'react';
 import {Check, UserPlus, X} from "lucide-react";
 import axios from "axios";
 import {useRouter} from "next/navigation";
+import {pusherClient} from "@/lib/pusher";
+import {toPusherKey} from "@/lib/utils";
 
 interface FriendRequestsProps {
     incomingFriendRequests: IncomingFriendRequest[];
@@ -13,6 +15,24 @@ interface FriendRequestsProps {
 const FriendRequests: FunctionComponent<FriendRequestsProps> = ({incomingFriendRequests, sessionId}) => {
     const [friendRequests, setFriendRequests] = useState(incomingFriendRequests);
     const router = useRouter();
+
+    useEffect(() => {
+        pusherClient.subscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`));
+
+        const friendRequestsHandler = ({senderId, senderEmail}: IncomingFriendRequest) => {
+            console.log('new friend request');
+            setFriendRequests((prevState) => [...prevState, {
+                senderId, senderEmail
+            }]);
+        }
+
+        pusherClient.bind('incoming_friend_requests', friendRequestsHandler);
+
+        return () => {
+            pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:incoming_friend_requests`));
+            pusherClient.unbind('incoming_friend_requests', friendRequestsHandler);
+        }
+    }, []);
 
     const acceptFriend = async (senderId: string) => {
         await axios.post('/api/friends/accept', {id: senderId});
